@@ -2504,6 +2504,7 @@ void UiMenu_UpdateItem(uint16_t select, uint16_t mode, int pos, int var, char* o
             ts.flags1 &= ~FLAGS1_CAT_MODE_ACTIVE;
         if (var_change)
         {
+#ifdef USE_USB
             if(ts.flags1 & FLAGS1_CAT_MODE_ACTIVE)
             {
                 CatDriver_InitInterface();
@@ -2512,6 +2513,7 @@ void UiMenu_UpdateItem(uint16_t select, uint16_t mode, int pos, int var, char* o
             {
                 CatDriver_StopInterface();
             }
+#endif
         }
         break;
     case CONFIG_FREQUENCY_CALIBRATE:        // Frequency Calibration
@@ -3456,6 +3458,7 @@ void UiMenu_UpdateItem(uint16_t select, uint16_t mode, int pos, int var, char* o
             clr = Green;
         }
         break;
+#ifdef USE_USB
      case MENU_DEBUG_CLONEOUT:
         txt_ptr = " Do it!";
         clr = White;
@@ -3478,7 +3481,7 @@ void UiMenu_UpdateItem(uint16_t select, uint16_t mode, int pos, int var, char* o
             clr = Green;
         }
         break;
-
+#endif
     default:                        // Move to this location if we get to the bottom of the table!
         txt_ptr = "ERROR!";
         break;
