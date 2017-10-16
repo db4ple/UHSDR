@@ -43,5 +43,5 @@ deploy:
   api_key:
     secure: "SECURE TOKEN MISSING"
   on:
-    repo: df8oe/mchf-github
+    repo: db4ple/mchf-github
     tags: true
