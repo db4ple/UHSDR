@@ -39,14 +39,14 @@ deploy:
   api_key:
     secure: DZS3GqUvmvC8nYLFVpcrMN1DvNSx1GOdCCrOg7BNsIlZGnN/jWK21IqLd5/70MqkpbRF8sDYiV+zI4AIrFAU5KkKnhZwVawR8+/5Dj1ukdwEJQMrWKSZ9d/l5B49jP5ytqvgx8RU5grlQNa+CSZPI7C1GH1Adi6NRzj4ALhihGNfwIjViAf9kRXcQF/c46SctgNmfTWNu+qP2P7LhZ1ywDyerkw7q5XAk/6kP68FNloqDHa756HMLwdGNs3ErVSx71tGxvNnc7ox7h+Gs0i43HpP6UvVvYKqtffX0Dw9oo7aSV3b7Skvn7/i3/ZZuXLzoPbf4tVW1jUjc+xyyplwhcO3o+sW3PSATHaVv7Uig/AvXOaywxLoGO0XpAIkbSjNNOdLqj4+hfo22xbwIN2SiFJgb/7B8GA6m5ZIiVQ/dN3ZfhynHFLTG4VcPOjkFo8pgsLRgb+O6TeEjZmu7iEpQ/tkcZT8b1r0R9D9Ku/D0Bf4g7YFrgx95ZFLirV3Z2ibBmbIguls6upfsG/EaXUulwNwTbuSBBHdZvzHroObzvaP5LgP0IZqI27ykfEUOZakRKFzFEoZNz0N6hkNsjnVG6A+kOi48Ic3iE6pjSz7dzt/MdoqRra8qHOKjV03KixMau/hWasVz/9ksdVabRBi3/4Cl9X+1WXdgn7XGeSMYdk=
   file: 
-  - mchf-eclipse/build-fw/fw-mchf.bin
-  - mchf-eclipse/build-fw-f7/fw-ovi40.bin
-  - mchf-eclipse/build-bl/bl-mchf.bin
-  - mchf-eclipse/build-bl-f7/bl-ovi40.bin
-  - mchf-eclipse/build-fw/fw-mchf.dfu
-  - mchf-eclipse/build-fw-f7/fw-ovi40.dfu
-  - mchf-eclipse/build-bl/bl-mchf.dfu
-  - mchf-eclipse/build-bl-f7/bl-ovi40.dfu
+  - build-fw/fw-mchf.bin
+  - build-fw-f7/fw-ovi40.bin
+  - build-bl/bl-mchf.bin
+  - build-bl-f7/bl-ovi40.bin
+  - build-fw/fw-mchf.dfu
+  - build-fw-f7/fw-ovi40.dfu
+  - build-bl/bl-mchf.dfu
+  - build-bl-f7/bl-ovi40.dfu
   skip_cleanup: true
   on:
     repo: db4ple/mchf-github
