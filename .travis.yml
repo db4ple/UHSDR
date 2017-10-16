@@ -50,6 +50,7 @@ deploy:
   skip_cleanup: true
   on:
     repo: db4ple/mchf-github
+    tags: true
     branches: 
       only:
       - test-my-idea
