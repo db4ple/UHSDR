@@ -1,70 +1,69 @@
 env:
-   global:
-   - GCC_BASE=gcc-arm-none-eabi-6-2017-q1-update
-   - GCC_SHORT=6_1-2017q1
-
+  global:
+  - GCC_BASE=gcc-arm-none-eabi-6-2017-q1-update
+  - GCC_SHORT=6_1-2017q1
 sudo: required
 language: generic
 dist: trusty
-
 addons:
   apt:
-    packages:
-      libc6-i386
-
+    packages: libc6-i386
 cache:
   directories:
-    - $HOME/$GCC_BASE
-
+  - "$HOME/$GCC_BASE"
 install:
-    - export GCC_DIR=$HOME/$GCC_BASE
-    - export GCC_ARCHIVE=$HOME/$GCC_BASE-linux.tar.bz2
-    - export GCC_URL=https://armkeil.blob.core.windows.net/developer/Files/downloads/gnu-rm/$GCC_SHORT/$GCC_BASE-linux.tar.bz2
-    - if [ ! -e $GCC_DIR/bin/arm-none-eabi-g++ ]; then wget $GCC_URL -O $GCC_ARCHIVE; tar xfj $GCC_ARCHIVE -C $HOME; fi
+- export GCC_DIR=$HOME/$GCC_BASE
+- export GCC_ARCHIVE=$HOME/$GCC_BASE-linux.tar.bz2
+- export GCC_URL=https://armkeil.blob.core.windows.net/developer/Files/downloads/gnu-rm/$GCC_SHORT/$GCC_BASE-linux.tar.bz2
+- if [ ! -e $GCC_DIR/bin/arm-none-eabi-g++ ]; then wget $GCC_URL -O $GCC_ARCHIVE;
+  tar xfj $GCC_ARCHIVE -C $HOME; fi
 script:
-    - mkdir -p mchf-eclipse/build-bl-f4
-    - mkdir -p mchf-eclipse/build-fw-f4
-    - mkdir -p mchf-eclipse/build-bl-f7
-    - mkdir -p mchf-eclipse/build-bl-h7
-    - mkdir -p mchf-eclipse/build-fw-f7
-    - mkdir -p mchf-eclipse/build-fw-f4-ili9486-480
-    - mkdir -p mchf-eclipse/build-fw-f4-small
-    - mkdir -p mchf-eclipse/build-fw-h7
-    - cd mchf-eclipse/build-fw-h7
-    - cd ../build-bl-h7
-    - make -f ../Makefile OPT_GCC_ARM=$GCC_DIR ROOTLOC=".." BUILDFOR="H7" TRX_ID="i40h7" TRX_NAME="OVI40H7" bootloader 
-    - cd ../build-fw-h7
-    - make -f ../Makefile OPT_GCC_ARM=$GCC_DIR ROOTLOC=".." BUILDFOR="H7" TRX_ID="i40h7" TRX_NAME="OVI40H7" all 
-    - cd ../build-fw-f4 
-    - make -f ../Makefile OPT_GCC_ARM=$GCC_DIR ROOTLOC=".." all
-    - cd ../build-bl-f4
-    - make -f ../Makefile OPT_GCC_ARM=$GCC_DIR ROOTLOC=".." bootloader
-    - cd ../build-fw-f7
-    - make -f ../Makefile OPT_GCC_ARM=$GCC_DIR ROOTLOC=".." BUILDFOR="F7" TRX_ID="ovi40" TRX_NAME="OVI40" all	
-    - cd ../build-bl-f7
-    - make -f ../Makefile OPT_GCC_ARM=$GCC_DIR ROOTLOC=".." BUILDFOR="F7" TRX_ID="ovi40" TRX_NAME="OVI40" bootloader
-    - cd ../build-fw-f4-ili9486-480
-    - make -f ../Makefile OPT_GCC_ARM=$GCC_DIR ROOTLOC=".." LCD_TYPE=1 all
-    - cd ../build-fw-f4-small
-    - make -f ../Makefile OPT_GCC_ARM=$GCC_DIR CONFIGFLAGS="-DIS_SMALL_BUILD" ROOTLOC=".." all
-    - cd ..
-before_deploy:
-    #- sudo apt-get install -y doxygen graphviz
-    #- make docs > /dev/null && tar -czf docs.tar.gz -C .. docs
+- mkdir -p mchf-eclipse/build-bl-f4
+- mkdir -p mchf-eclipse/build-fw-f4
+- mkdir -p mchf-eclipse/build-bl-f7
+- mkdir -p mchf-eclipse/build-bl-h7
+- mkdir -p mchf-eclipse/build-fw-f7
+- mkdir -p mchf-eclipse/build-fw-f4-ili9486-480
+- mkdir -p mchf-eclipse/build-fw-f4-small
+- mkdir -p mchf-eclipse/build-fw-h7
+- cd mchf-eclipse/build-fw-h7
+- cd ../build-bl-h7
+- make -f ../Makefile OPT_GCC_ARM=$GCC_DIR ROOTLOC=".." BUILDFOR="H7" TRX_ID="i40h7"
+  TRX_NAME="OVI40H7" bootloader
+- cd ../build-fw-h7
+- make -f ../Makefile OPT_GCC_ARM=$GCC_DIR ROOTLOC=".." BUILDFOR="H7" TRX_ID="i40h7"
+  TRX_NAME="OVI40H7" all
+- cd ../build-fw-f4
+- make -f ../Makefile OPT_GCC_ARM=$GCC_DIR ROOTLOC=".." all
+- cd ../build-bl-f4
+- make -f ../Makefile OPT_GCC_ARM=$GCC_DIR ROOTLOC=".." bootloader
+- cd ../build-fw-f7
+- make -f ../Makefile OPT_GCC_ARM=$GCC_DIR ROOTLOC=".." BUILDFOR="F7" TRX_ID="ovi40"
+  TRX_NAME="OVI40" all
+- cd ../build-bl-f7
+- make -f ../Makefile OPT_GCC_ARM=$GCC_DIR ROOTLOC=".." BUILDFOR="F7" TRX_ID="ovi40"
+  TRX_NAME="OVI40" bootloader
+- cd ../build-fw-f4-ili9486-480
+- make -f ../Makefile OPT_GCC_ARM=$GCC_DIR ROOTLOC=".." LCD_TYPE=1 all
+- cd ../build-fw-f4-small
+- make -f ../Makefile OPT_GCC_ARM=$GCC_DIR CONFIGFLAGS="-DIS_SMALL_BUILD" ROOTLOC=".."
+  all
+- cd ..
+before_deploy: 
 deploy:
   provider: releases
   api_key:
-    secure: "6kEbfOiJSR7FgDmmLNVTEg"
-  file: 
+    secure: 6kEbfOiJSR7FgDmmLNVTEg
+  file:
   - build-fw-f4/fw-mchf.bin
   - build-fw-f7/fw-ovi40.bin
   - build-fw-h7/fw-vi40h7.bin
   - build-bl-f4/bl-mchf.bin
   - build-bl-f7/bl-ovi40.bin
-  - build-bl-h7/bl-i40h7.bin  
+  - build-bl-h7/bl-i40h7.bin
   - build-fw-f4/fw-mchf.dfu
   - build-fw-f7/fw-ovi40.dfu
-  - build-fw-h7/fw-i40h7.dfu  
+  - build-fw-h7/fw-i40h7.dfu
   - build-bl-f4/bl-mchf.dfu
   - build-bl-f7/bl-ovi40.dfu
   - build-bl-h7/bl-i40h7.dfu
@@ -72,6 +71,8 @@ deploy:
   on:
     repo: db4ple/mchf-github
     tags: true
-    branches: 
+    branches:
       only:
       - ovi40h7
+  key:
+    secure: dceiAtzwQnH4jiUGUBlG65gFI0ok5bzO4fyK6kU3deZy3fGFcbJJwfon7HCxmxsSwvS6UOOkuw8gvYdm7RWQd3JYBUEprOTGRBGBsfHLECABx4ISkS5tyaWOYdSDTMMfh7+MYB1hD8hVwOfabyX01032tJDlQ9r0DXJ80GcI7qDAOy4tiK8rmsLenHgPIHiaoXcf5zQODeBtf79IDnEqdsw/Dr8kuYgvmPfy9rc8qJ/2McX057Ronz8Onsic/9rgoqo/KtUT9CuQvtWd/L6JgDkqBxaR6+213Yxu/nnqlBJq+d5MRzOCUpA1MsUBCNsQxFYrCE18ZMgDkMp37q8I4DwlM/+BuwNpmyfLzxiMvgsyoh1vyKSd8BNSe2YM8OC92wD8/Lzy8G2qvXCXoZw2rUPA0RI+/BAkR17nWiGVtDHtkfLo1gFw8fTj6jWKChT65HocGnBTQ5jFASgnYEFAGX3OSJNlmv5mHhIFFidJOvnbbs8zoCxnjENAiV6HRzkcj9DuLKgGT6zWiyiUzhUYXyvB2Kvi2YccTrWCK4DVByFy9/S3wkWcXRRPIdy6XSene7jZ1h3uhx1XOm/QxR/IAE1hCqjoeLSQboOrMagPULV3M3aMK1is7by67Vvcw1lzlhEykO1GhvRQn4cGKJPyKoCoQAvoHC2j1CF7ocTgYxs=
