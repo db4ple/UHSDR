@@ -49,8 +49,8 @@ script:
     - make -f ../Makefile OPT_GCC_ARM=$GCC_DIR CONFIGFLAGS="-DIS_SMALL_BUILD" ROOTLOC=".." all
     - cd ..
 before_deploy:
-    - sudo apt-get install -y doxygen graphviz
-    - make docs > /dev/null && tar -czf docs.tar.gz -C .. docs
+    #- sudo apt-get install -y doxygen graphviz
+    #- make docs > /dev/null && tar -czf docs.tar.gz -C .. docs
 deploy:
   provider: releases
   api_key:
