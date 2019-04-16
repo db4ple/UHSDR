@@ -3299,16 +3299,68 @@ static void UiDriver_ChangeBand(uchar is_up)
  *
  * @returns true if a frequency change was detected and a new tuning frequency was set in a global variable.
  */
+int32_t UiDriver_GetEncoderSpeedMultiplier(float32_t enc_speed_avg)
+{
+    int32_t enc_multiplier = 1;
+
+    int32_t enc_speed_abs = abs(enc_speed_avg); // in order to simplify comparison, we use absolute value.
+
+    if (!ts.smooth_dyn_tune)        // Smooth dynamic tune is OFF
+    {
+        if (enc_speed_abs > 80)
+        {
+            enc_multiplier = 10;    // turning medium speed -> increase speed by 10
+        }
+        if (enc_speed_abs > 150)
+        {
+            enc_multiplier = 30;    //turning fast speed -> increase speed by 100
+        }
+        if (enc_speed_abs > 300)
+        {
+            enc_multiplier = 100;    //turning fast speed -> increase speed by 100
+        }
+    }
+    else
+    {
+        if (enc_speed_abs > 350)
+        {
+            enc_multiplier = 100;    // turning medium speed -> increase speed by 100
+        }
+        else if (enc_speed_abs > 250)
+        {
+            enc_multiplier =  50;    //turning fast speed -> increase speed by 50
+        }
+        else if (enc_speed_abs > 180)
+        {
+            enc_multiplier =  12;    //turning fast speed -> increase speed by 12
+        }
+        else if (enc_speed_abs >  90)
+        {
+            enc_multiplier =   6;    //turning fast speed -> increase speed by 6
+        }
+        else if (enc_speed_abs >  45)
+        {
+            enc_multiplier =   3;    //turning fast speed -> increase speed by 3
+        }
+        else if (enc_speed_abs >  30)
+        {
+            enc_multiplier =   2;    //turning fast speed -> increase speed by 2
+        }
+    }
+
+    return enc_multiplier;
+}
+
+
+
 static bool UiDriver_CheckFrequencyEncoder()
 {
-	int 		pot_diff;
 	bool		retval = false;
-	int		enc_multiplier;
-	static float 	enc_speed_avg = 0.0;  //keeps the averaged encoder speed
-	int		delta_t, enc_speed;
+	static float32_t 	enc_speed_avg = 0.0;  //keeps the averaged encoder speed
 
-	pot_diff = UiDriverEncoderRead(ENCFREQ);
+	int32_t pot_diff = UiDriverEncoderRead(ENCFREQ);
 
+	int32_t delta_t = 0;
 
 	if (pot_diff != 0)
 	{
@@ -3316,8 +3368,8 @@ static bool UiDriver_CheckFrequencyEncoder()
 		ts.audio_int_counter = 0;		 //reset tick counter
 
 		UiDriver_LcdBlankingStartTimer();	// calculate/process LCD blanking timing
-
 	}
+
 	if (pot_diff != 0 &&
 			ts.txrx_mode == TRX_MODE_RX
 			&& ks.button_just_pressed == false
@@ -3329,7 +3381,7 @@ static bool UiDriver_CheckFrequencyEncoder()
 			enc_speed_avg = 0;    //when leaving speedy turning set avg_speed to 0
 		}
 
-		enc_speed = div(4000,delta_t).quot*pot_diff;  // app. 4000 tics per second -> calc. enc. speed.
+		int32_t enc_speed = div(4000,delta_t).quot*pot_diff;  // app. 4000 tics per second -> calc. enc. speed.
 
 		if (enc_speed > 500)
 		{
@@ -3342,50 +3394,11 @@ static bool UiDriver_CheckFrequencyEncoder()
 
 		enc_speed_avg = 0.1*enc_speed + 0.9*enc_speed_avg; // averaging to smooth encoder speed
 
-		enc_multiplier = 1; //set standard speed
+		int32_t enc_multiplier = 1; //set standard speed
 
 		if (ts.flags1 & FLAGS1_DYN_TUNE_ENABLE)   // check if dynamic tuning has been activated by touchscreen
 		{
-		    if (!ts.smooth_dyn_tune)        // Smooth dynamic tune is OFF
-				if ((enc_speed_avg > 80) || (enc_speed_avg < (-80)))
-				{
-					enc_multiplier = 10;    // turning medium speed -> increase speed by 10
-				}
-
-				if ((enc_speed_avg > 160) || (enc_speed_avg < (-160)))
-				{
-					enc_multiplier = 40;    //turning fast speed -> increase speed by 100
-				}
-
-				if ((enc_speed_avg > 300) || (enc_speed_avg < (-300)))
-				{
-					enc_multiplier = 100;    //turning fast speed -> increase speed by 100
-				}
-            else
-                if      ((enc_speed_avg > 350) || (enc_speed_avg < (-350)))
-                {
-                    enc_multiplier = 100;    // turning medium speed -> increase speed by 100
-                }
-                else if ((enc_speed_avg > 250) || (enc_speed_avg < (-250)))
-                {
-                    enc_multiplier =  50;    //turning fast speed -> increase speed by 50
-                }
-                else if ((enc_speed_avg > 180) || (enc_speed_avg < (-180)))
-                {
-                    enc_multiplier =  12;    //turning fast speed -> increase speed by 12
-                }
-                else if ((enc_speed_avg >  90) || (enc_speed_avg < (- 90)))
-                {
-                    enc_multiplier =   6;    //turning fast speed -> increase speed by 6
-                }
-                else if ((enc_speed_avg >  45) || (enc_speed_avg < (- 45)))
-                {
-                    enc_multiplier =   3;    //turning fast speed -> increase speed by 3
-                }
-                else if ((enc_speed_avg >  30) || (enc_speed_avg < (- 30)))
-                {
-                    enc_multiplier =   2;    //turning fast speed -> increase speed by 2
-                }
+		    enc_multiplier = UiDriver_GetEncoderSpeedMultiplier(enc_speed_avg);
 
 			if ((df.tuning_step == 10000) && (enc_multiplier > 10))
 			{
@@ -3476,6 +3489,7 @@ static void UiDriver_CheckEncoderOne()
 		}
 	}
 }
+
 //
 //*----------------------------------------------------------------------------
 //* Function Name       : UiDriverCheckEncoderTwo
@@ -3500,16 +3514,13 @@ static void UiDriver_CheckEncoderTwo()
 		{
 			int8_t pot_diff_step = pot_diff < 0?-1:1;
 
-
 			if(ts.txrx_mode == TRX_MODE_RX)
 			{
 
 				// dynamic encoder speed , used for notch and peak
 				static float    enc_speed_avg = 0.0;  //keeps the averaged encoder speed
-				int     delta_t, enc_speed;
-				float32_t   enc_multiplier;
 
-				delta_t = ts.audio_int_counter;  // get ticker difference since last enc. change
+				int32_t delta_t = ts.audio_int_counter;  // get ticker difference since last enc. change
 				ts.audio_int_counter = 0;        //reset tick counter
 
 				if (delta_t > 300)
@@ -3517,7 +3528,7 @@ static void UiDriver_CheckEncoderTwo()
 					enc_speed_avg = 0;    //when leaving speedy turning set avg_speed to 0
 				}
 
-				enc_speed = div(4000,delta_t).quot*pot_diff;  // app. 4000 tics per second -> calc. enc. speed.
+				int32_t enc_speed = div(4000,delta_t).quot*pot_diff;  // app. 4000 tics per second -> calc. enc. speed.
 
 				if (enc_speed > 500)
 				{
@@ -3530,60 +3541,10 @@ static void UiDriver_CheckEncoderTwo()
 
 				enc_speed_avg = 0.1*enc_speed + 0.9*enc_speed_avg; // averaging to smooth encoder speed
 
-				enc_multiplier = 1; //set standard speed
-
-				if (!ts.smooth_dyn_tune)        // Smooth dynamic tune is OFF
-					if ((enc_speed_avg > 80) || (enc_speed_avg < (-80)))
-					{
-						enc_multiplier = 10;    // turning medium speed -> increase speed by 10
-					}
-					if ((enc_speed_avg > 150) || (enc_speed_avg < (-150)))
-					{
-						enc_multiplier = 30;    //turning fast speed -> increase speed by 100
-					}
-					if ((enc_speed_avg > 300) || (enc_speed_avg < (-300)))
-					{
-						enc_multiplier = 100;    //turning fast speed -> increase speed by 100
-					}
-                else
-                    if      ((enc_speed_avg > 350) || (enc_speed_avg < (-350)))
-                    {
-                        enc_multiplier = 100;    // turning medium speed -> increase speed by 100
-                    }
-                    else if ((enc_speed_avg > 250) || (enc_speed_avg < (-250)))
-                    {
-                        enc_multiplier =  50;    //turning fast speed -> increase speed by 50
-                    }
-                    else if ((enc_speed_avg > 180) || (enc_speed_avg < (-180)))
-                    {
-                        enc_multiplier =  12;    //turning fast speed -> increase speed by 12
-                    }
-                    else if ((enc_speed_avg >  90) || (enc_speed_avg < (- 90)))
-                    {
-                        enc_multiplier =   6;    //turning fast speed -> increase speed by 6
-                    }
-                    else if ((enc_speed_avg >  45) || (enc_speed_avg < (- 45)))
-                    {
-                        enc_multiplier =   3;    //turning fast speed -> increase speed by 3
-                    }
-                    else if ((enc_speed_avg >  30) || (enc_speed_avg < (- 30)))
-                    {
-                        enc_multiplier =   2;    //turning fast speed -> increase speed by 2
-                    }
+				float32_t enc_multiplier = UiDriver_GetEncoderSpeedMultiplier(enc_speed_avg); //set standard speed
 
 				// used for notch and peak
-				float32_t MAX_FREQ = 5000.0;
-
-				if (ts.filters_p->sample_rate_dec == RX_DECIMATION_RATE_24KHZ)
-				{
-					MAX_FREQ = 10000.0;
-				}
-				else if (ts.filters_p->sample_rate_dec == RX_DECIMATION_RATE_12KHZ)
-				{
-					MAX_FREQ = 5000.0;
-				}
-
-
+				float32_t MAX_FREQ = (ads.decimated_freq >= 24000) ? 10000.0 : 5000.0;
 
 				switch(ts.enc_two_mode)
 				{
@@ -3721,7 +3682,6 @@ static void UiDriver_CheckEncoderTwo()
 				}
 			}
 			else { // in TX case only bass & treble gain can be adjusted with encoder TWO
-
 				// Take appropriate action
 				switch(ts.enc_two_mode)
 				{
