@@ -331,7 +331,7 @@ void RadioManagement_MuteTemporarilyRxAudio();
 uint32_t RadioManagement_NextNormalDemodMode(uint32_t loc_mode);
 uint32_t RadioManagement_NextAlternativeDemodMode(uint32_t loc_mode);
 
-Oscillator_ResultCodes_t RadioManagement_ValidateFrequencyForTX(uint32_t dial_freq);
+bool RadioManagement_ValidateFrequencyForTX(uint32_t dial_freq);
 bool RadioManagement_IsApplicableDemodMode(uint32_t demod_mode);
 void RadioManagement_SwitchTxRx(uint8_t txrx_mode, bool tune_mode);
 bool RadioManagement_LSBActive(uint16_t dmod_mode);
