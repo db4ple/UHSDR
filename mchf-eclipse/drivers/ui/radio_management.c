@@ -732,10 +732,12 @@ void RadioManagement_MuteTemporarilyRxAudio()
     ts.audio_dac_muting_buffer_count = 13 * 15;
 }
 
-Oscillator_ResultCodes_t RadioManagement_ValidateFrequencyForTX(uint32_t dial_freq)
+bool RadioManagement_ValidateFrequencyForTX(uint32_t dial_freq)
 {
     // we check with the si570 code if the frequency is tunable, we do not tune to it.
-    bool osc_ok = osc->prepareNextFrequency(RadioManagement_Dial2TuneFrequency(dial_freq, TRX_MODE_TX), df.temp_factor);
+	Oscillator_ResultCodes_t osc_res = osc->prepareNextFrequency(RadioManagement_Dial2TuneFrequency(dial_freq, TRX_MODE_TX), df.temp_factor);
+    bool osc_ok = osc_res == OSC_OK || osc_res == OSC_TUNE_LIMITED;
+	
     // we also check if our PA is able to support this frequency
     bool pa_ok = dial_freq >= mchf_pa.min_freq && dial_freq <= mchf_pa.max_freq;
 
@@ -902,7 +904,7 @@ void RadioManagement_SwitchTxRx(uint8_t txrx_mode, bool tune_mode)
     if(txrx_mode == TRX_MODE_TX)
     {
         // FIXME: Not very robust code, make sure Validate always returns TUNE_IMPOSSIBLE in case of issues
-        tx_ok = RadioManagement_ValidateFrequencyForTX(tune_new) != OSC_TUNE_IMPOSSIBLE;
+        tx_ok = RadioManagement_ValidateFrequencyForTX(tune_new);
 
 
         // this code handles the ts.tx_disable
