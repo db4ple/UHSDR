@@ -167,12 +167,19 @@ void 	UiLcdHy28_DrawBottomButton(ushort Xpos, ushort Ypos, ushort Height, ushort
 void 	UiLcdHy28_DrawFullRect (ushort Xpos, ushort Ypos, ushort Height, ushort Width, ushort color);
 
 void 	UiLcdHy28_DrawColorPoint(ushort x, ushort y, ushort color);
+void    UiLcdHy28_DrawStraightLineWidth(ushort x, ushort y, ushort Length, uint16_t Width, uchar Direction,ushort color);
 
 void    UiLcdHy28_BulkPixel_OpenWrite(ushort x, ushort width, ushort y, ushort height);
 void    UiLcdHy28_BulkPixel_CloseWrite();
 void 	UiLcdHy28_BulkPixel_Put(uint16_t pixel);
 void    UiLcdHy28_BulkPixel_PutBuffer(uint16_t* pixel_buffer, uint32_t len);
 void    UiLcdHy28_BulkPixel_BufferFlush();
+
+void    UiLcdHy28_BulkWriteColor(uint16_t Color, uint32_t len);
+void    UiLcdHy28_CloseBulkWrite();
+void    UiLcdHy28_OpenBulkWrite(ushort x, ushort width, ushort y, ushort height);
+void    UiLcdHy28_BulkPixel_BufferInit();
+
 
 uint8_t 	UiLcdHy28_Init();
 

@@ -30,6 +30,7 @@ typedef struct
     uint8_t BitCount;
     uint8_t firstCode;
     uint8_t  Spacing;
+    uint8_t  isVariable;
 #ifdef USE_8bit_FONT
     const uint16_t *offsetTable;
     const uint8_t *heightTable;

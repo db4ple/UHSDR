@@ -1920,7 +1920,8 @@ const sFONT GL_Font16x24_8b_Square =
         .firstCode = 0x20,
         .Spacing = 1,
         .maxCode = (0x2e + 12),
-        .offsetTable = (const uint16_t*)SY_Font16x24_8b_Square_Offset
+        .offsetTable = (const uint16_t*)SY_Font16x24_8b_Square_Offset,
+        .isVariable = 1
 };
 
 #endif
